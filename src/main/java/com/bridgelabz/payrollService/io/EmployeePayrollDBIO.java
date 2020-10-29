@@ -172,18 +172,25 @@ public class EmployeePayrollDBIO {
 		EmployeePayrollData employeePayrollData = null;
 		try {
 			connection = this.getConnection();
+			connection.setAutoCommit(false);
 		}catch(SQLException exception) {
 			exception.printStackTrace();
 		}
 		try(Statement statement = connection.createStatement()){
-			String sql = String.format("INSERT INTO employee_payroll VALUES ('%s','%s','%s','%s')", name,
+			String query = String.format("INSERT INTO employee_payroll VALUES ('%s','%s','%s','%s')", name,
 					gender, salary, Date.valueOf(startDate));
-			int rowAffected = statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+			int rowAffected = statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
 			if(rowAffected==1) {
 				ResultSet resultSet = statement.getGeneratedKeys();
 				if(resultSet.next()) empId =  resultSet.getInt(1);
 			}
 		} catch (SQLException exception) {
+			try {
+				connection.rollback();
+				return employeePayrollData;
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
 			exception.printStackTrace();
 		}
 		
@@ -192,14 +199,31 @@ public class EmployeePayrollDBIO {
 			double taxablePay = salary-deductions;
 			double tax = taxablePay*0.1;
 			double netPay = salary - tax;
-			String sql =  String.format("INSERT INTO payroll_details VALUES"
+			String query =  String.format("INSERT INTO payroll_details VALUES"
 					+ "( %s, %s, %s ,%s, %s, %s)",empId,salary,deductions,taxablePay,tax,netPay);
-			int rowAffected = statement.executeUpdate(sql);
+			int rowAffected = statement.executeUpdate(query);
 			if(rowAffected == 1) {
 				employeePayrollData = new EmployeePayrollData(empId,name,salary,startDate);
 			}
 		} catch (SQLException exception) {
 			exception.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+		}
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			if(connection!=null)
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 		}
 		return employeePayrollData;
 	}
