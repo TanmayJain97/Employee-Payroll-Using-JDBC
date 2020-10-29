@@ -1,11 +1,15 @@
 package com.bridgelabz.payrollService;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
+import com.bridgelabz.payrollService.Exception.EmployeePayrollException;
+import com.bridgelabz.payrollService.Exception.EmployeePayrollException.ExceptionType;
 import com.bridgelabz.payrollService.Models.EmployeePayrollData;
 import com.bridgelabz.payrollService.io.EmployeePayrollDBIO;
+import com.bridgelabz.payrollService.io.EmployeePayrollDBIO.StatementType;
 import com.bridgelabz.payrollService.io.EmployeePayrollFileIO;
 
 public class EmployeePayrollMain {
@@ -15,6 +19,7 @@ public class EmployeePayrollMain {
 
 	//Declaring global var list of employee data
 	public List<EmployeePayrollData> employeeDataList;
+	private EmployeePayrollDBIO payrollDBobj;
 
 	/**Setter for list containing Emp Data
 	 * @param List containing Emp Data
@@ -27,7 +32,7 @@ public class EmployeePayrollMain {
 	 * 
 	 */
 	public EmployeePayrollMain() {
-		employeeDataList = new ArrayList<EmployeePayrollData>();
+		payrollDBobj = EmployeePayrollDBIO.getInstance();
 	}
 
 	/**Read Emp Data from console <br>
@@ -91,6 +96,46 @@ public class EmployeePayrollMain {
 		return null;
 	}
 
+	public void updateEmployeeSalary(String name, double salary,StatementType type) throws EmployeePayrollException {
+		int result = payrollDBobj.updateEmployeeData(name,salary,type);
+		EmployeePayrollData employeePayrollData = null;
+		if(result == 0)
+			throw new EmployeePayrollException(ExceptionType.UPDATE_FAIL, "Update Failed");
+		else 
+			 employeePayrollData = this.getEmployeePayrollData(name);
+		if(employeePayrollData!=null) {
+			employeePayrollData.salary = salary;
+		}
+	}
+
+	private EmployeePayrollData getEmployeePayrollData(String name) {
+		EmployeePayrollData employeePayrollData = this.employeeDataList.stream()
+				.filter(employee->employee.name.equals(name))
+				.findFirst()
+				.orElse(null);
+		return employeePayrollData;
+	}
+	
+	public boolean checkEmployeePayrollInSyncWithDB(String name) {
+		List<EmployeePayrollData> checkList = payrollDBobj.getEmployeePayrollData(name);
+		return checkList.get(0).equals(getEmployeePayrollData(name));
+	}
+	
+	public List<EmployeePayrollData> getEmployeesInDateRange(String date1, String date2) {
+		List<EmployeePayrollData> employeeList = payrollDBobj.getEmployeesInGivenDateRange(date1,date2);
+		return employeeList;
+	}
+	
+	public Map<String, Double> readAverageSalaryByGender(IOCommand ioType) {
+		if(ioType.equals(IOCommand.DB_IO)) 
+			return payrollDBobj.getAverageSalaryByGender();
+		return null;
+	}
+	
+	public void addEmployeeToPayroll(String name, double salary, LocalDate startDate, String gender) {
+		employeeDataList.add(payrollDBobj.addEmployeeToPayroll(name,salary,startDate,gender));
+	}
+	
 	//Main Method
 	public static void main(String[] args) {
 		EmployeePayrollMain employeeFunction = new EmployeePayrollMain();
