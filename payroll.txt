@@ -1,0 +1,1 @@
+id = 141, name = Samson, salary = 55000.0
