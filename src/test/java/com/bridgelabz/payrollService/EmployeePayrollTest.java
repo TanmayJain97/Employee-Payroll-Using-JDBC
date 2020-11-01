@@ -90,4 +90,19 @@ public class EmployeePayrollTest {
 		Instant end = Instant.now();
 		System.out.println("Duration Without Thread: "+java.time.Duration.between(start, end));
 	}
+	
+	public void givenEmployeeData_ShouldPrintInstanceTime_ToConsole_UsingThreads() {
+		EmployeePayrollData[] arrayOfEmp = {
+				new EmployeePayrollData(1, "Jeff Bezos", 100000.0, LocalDate.now()),
+				new EmployeePayrollData(2, "Bill Gates", 200000.0, LocalDate.now()),
+				new EmployeePayrollData(3, "Mark Zuckerberg", 300000.0, LocalDate.now()),
+				new EmployeePayrollData(4, "Sundar", 600000.0, LocalDate.now()),
+				new EmployeePayrollData(5, "Mukesh", 500000.0, LocalDate.now()),
+				new EmployeePayrollData(6, "Anil", 300000.0, LocalDate.now())
+		};
+		Instant start = Instant.now();
+		employeeFunction.addEmployeesToPayrollUsingThreads(Arrays.asList(arrayOfEmp));
+		Instant end = Instant.now();
+		System.out.println("Duration Without Thread: "+java.time.Duration.between(start, end));
+	}
 }
