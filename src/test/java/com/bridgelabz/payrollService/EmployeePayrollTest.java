@@ -76,6 +76,7 @@ public class EmployeePayrollTest {
 		assertTrue(employeeFunction.checkEmployeePayrollInSyncWithDB("Mark"));
 	}
 	
+	@Test
 	public void givenEmployeeData_ShouldPrintInstanceTime_ToConsole() {
 		EmployeePayrollData[] arrayOfEmp = {
 				new EmployeePayrollData(1, "Jeff Bezos", 100000.0, LocalDate.now()),
@@ -91,6 +92,7 @@ public class EmployeePayrollTest {
 		System.out.println("Duration Without Thread: "+java.time.Duration.between(start, end));
 	}
 	
+	@Test
 	public void givenEmployeeData_ShouldPrintInstanceTime_ToConsole_UsingThreads() {
 		EmployeePayrollData[] arrayOfEmp = {
 				new EmployeePayrollData(1, "Jeff Bezos", 100000.0, LocalDate.now()),
@@ -103,6 +105,8 @@ public class EmployeePayrollTest {
 		Instant start = Instant.now();
 		employeeFunction.addEmployeesToPayrollUsingThreads(Arrays.asList(arrayOfEmp));
 		Instant end = Instant.now();
-		System.out.println("Duration Without Thread: "+java.time.Duration.between(start, end));
+		System.out.println("Duration With Thread: "+java.time.Duration.between(start, end));
 	}
+	
+	
 }
