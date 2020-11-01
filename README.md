@@ -1,3 +1,3 @@
 # Employee-Payroll-Using-JDBC
 
-Refacored UC 8 - Use Cascade delete
+Modified to UC 6 - Implement threads in multiple points to update the salary of multiple Employees.
