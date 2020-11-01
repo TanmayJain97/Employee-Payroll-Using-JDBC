@@ -2,11 +2,8 @@ package com.bridgelabz.payrollService;
 
 import static org.junit.Assert.*;
 
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
+import java.time.*;
+import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -77,5 +74,20 @@ public class EmployeePayrollTest {
 	public void givenNewEmployee_WhenAdded_ShouldSyncWithDB() {
 		employeeFunction.addEmployeeToPayroll("Mark",50000000.00,LocalDate.now(),"M");
 		assertTrue(employeeFunction.checkEmployeePayrollInSyncWithDB("Mark"));
+	}
+	
+	public void givenEmployeeData_ShouldPrintInstanceTime_ToConsole() {
+		EmployeePayrollData[] arrayOfEmp = {
+				new EmployeePayrollData(1, "Jeff Bezos", 100000.0, LocalDate.now()),
+				new EmployeePayrollData(2, "Bill Gates", 200000.0, LocalDate.now()),
+				new EmployeePayrollData(3, "Mark Zuckerberg", 300000.0, LocalDate.now()),
+				new EmployeePayrollData(4, "Sundar", 600000.0, LocalDate.now()),
+				new EmployeePayrollData(5, "Mukesh", 500000.0, LocalDate.now()),
+				new EmployeePayrollData(6, "Anil", 300000.0, LocalDate.now())
+		};
+		Instant start = Instant.now();
+		employeeFunction.addEmployeeToPayroll(Arrays.asList(arrayOfEmp));
+		Instant end = Instant.now();
+		System.out.println("Duration Without Thread: "+java.time.Duration.between(start, end));
 	}
 }

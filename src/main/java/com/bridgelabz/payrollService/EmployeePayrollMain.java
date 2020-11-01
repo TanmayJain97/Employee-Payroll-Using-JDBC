@@ -87,7 +87,7 @@ public class EmployeePayrollMain {
 	 * @return List containing Emp Data
 	 */
 	public List<EmployeePayrollData> readData(IOCommand ioType) {
-		
+
 		switch(ioType) {		
 		case FILE_IO: return new EmployeePayrollFileIO().readData();
 		case DB_IO: return new EmployeePayrollDBIO().readData();
@@ -102,7 +102,7 @@ public class EmployeePayrollMain {
 		if(result == 0)
 			throw new EmployeePayrollException(ExceptionType.UPDATE_FAIL, "Update Failed");
 		else 
-			 employeePayrollData = this.getEmployeePayrollData(name);
+			employeePayrollData = this.getEmployeePayrollData(name);
 		if(employeePayrollData!=null) {
 			employeePayrollData.salary = salary;
 		}
@@ -115,27 +115,33 @@ public class EmployeePayrollMain {
 				.orElse(null);
 		return employeePayrollData;
 	}
-	
+
 	public boolean checkEmployeePayrollInSyncWithDB(String name) {
 		List<EmployeePayrollData> checkList = payrollDBobj.getEmployeePayrollData(name);
 		return checkList.get(0).equals(getEmployeePayrollData(name));
 	}
-	
+
 	public List<EmployeePayrollData> getEmployeesInDateRange(String date1, String date2) {
 		List<EmployeePayrollData> employeeList = payrollDBobj.getEmployeesInGivenDateRange(date1,date2);
 		return employeeList;
 	}
-	
+
 	public Map<String, Double> readAverageSalaryByGender(IOCommand ioType) {
 		if(ioType.equals(IOCommand.DB_IO)) 
 			return payrollDBobj.getAverageSalaryByGender();
 		return null;
 	}
-	
+
 	public void addEmployeeToPayroll(String name, double salary, LocalDate startDate, String gender) {
 		employeeDataList.add(payrollDBobj.addEmployeeToPayroll(name,salary,startDate,gender));
 	}
-	
+
+	public void addEmployeeToPayroll(List<EmployeePayrollData> EmpList) {
+		for (EmployeePayrollData emp:EmpList) {
+			employeeDataList.add(payrollDBobj.addEmployeeToPayroll(emp.name,emp.salary,emp.startDate,"M"));
+		}
+	}
+
 	//Main Method
 	public static void main(String[] args) {
 		EmployeePayrollMain employeeFunction = new EmployeePayrollMain();
@@ -143,7 +149,7 @@ public class EmployeePayrollMain {
 		employeeFunction.writeEmployeeData(IOCommand.CONSOLE_IO);
 		employeeFunction.writeEmployeeData(IOCommand.FILE_IO);
 		employeeFunction.printData();
-		
+
 		System.out.println("Read from File.");
 		for (EmployeePayrollData employee:employeeFunction.readData(IOCommand.FILE_IO)) {
 			employee.printDataFileIO();
