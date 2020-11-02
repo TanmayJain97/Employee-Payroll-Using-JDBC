@@ -23,7 +23,7 @@ public class EmployeePayrollMain {
 	 * @param List containing Emp Data
 	 */
 	public void setEmployeeDataList(List<EmployeePayrollData> employeeDataList) {
-		this.employeeDataList = employeeDataList;
+		this.employeeDataList = new ArrayList<>(employeeDataList);
 	}
 
 	/**Constructor For Main Class
@@ -78,6 +78,7 @@ public class EmployeePayrollMain {
 	 */
 	public int countEntries(IOCommand ioType) {
 		if(ioType.equals(IOCommand.FILE_IO)) return new EmployeePayrollFileIO().countEntries();
+		else if(ioType.equals(IOCommand.REST_IO)) return employeeDataList.size();
 		return 0;
 	}
 
