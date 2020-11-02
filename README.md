@@ -1,3 +1,5 @@
 # Employee-Payroll-Using-JDBC
 
-Modified to UC 6 - Implement threads in multiple points to update the salary of multiple Employees.
+Modified to UC 5 - Delete employee from server given employee name
+
+

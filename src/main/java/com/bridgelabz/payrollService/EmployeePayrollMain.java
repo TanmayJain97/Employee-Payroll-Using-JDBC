@@ -23,7 +23,7 @@ public class EmployeePayrollMain {
 	 * @param List containing Emp Data
 	 */
 	public void setEmployeeDataList(List<EmployeePayrollData> employeeDataList) {
-		this.employeeDataList = employeeDataList;
+		this.employeeDataList = new ArrayList<>(employeeDataList);
 	}
 
 	/**Constructor For Main Class
@@ -54,7 +54,7 @@ public class EmployeePayrollMain {
 	 * @param ioType <br> CONSOLE_IO or FILE_IO
 	 */
 	public void writeEmployeeData(IOCommand ioType) {
-		if(ioType.equals(ioType.CONSOLE_IO)) {
+		if(ioType.equals(IOCommand.CONSOLE_IO)) {
 			System.out.println("Writing Employee Payroll Data to Console.");
 			for (EmployeePayrollData employee:employeeDataList) {
 				employee.printDataFileIO();
@@ -78,6 +78,7 @@ public class EmployeePayrollMain {
 	 */
 	public int countEntries(IOCommand ioType) {
 		if(ioType.equals(IOCommand.FILE_IO)) return new EmployeePayrollFileIO().countEntries();
+		else if(ioType.equals(IOCommand.REST_IO)) return employeeDataList.size();
 		return 0;
 	}
 
@@ -106,7 +107,7 @@ public class EmployeePayrollMain {
 		}
 	}
 
-	private EmployeePayrollData getEmployeePayrollData(String name) {
+	EmployeePayrollData getEmployeePayrollData(String name) {
 		EmployeePayrollData employeePayrollData = this.employeeDataList.stream()
 				.filter(employee->employee.name.equals(name))
 				.findFirst()
@@ -139,7 +140,7 @@ public class EmployeePayrollMain {
 			employeeDataList.add(payrollDBobj.addEmployeeToPayroll(emp.name,emp.salary,emp.startDate,"M"));
 		}
 	}
-	
+
 	public void addEmployeesToPayrollUsingThreads(List<EmployeePayrollData> EmpList) {
 		Runnable task= () ->
 		{
@@ -157,7 +158,7 @@ public class EmployeePayrollMain {
 			}
 		}
 	}
-	
+
 	public void updateEmployeeDataUsingThreads(List<EmployeePayrollData> EmpList) {
 		Runnable task= () ->
 		{
@@ -174,6 +175,39 @@ public class EmployeePayrollMain {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void addEmployeeToPayroll(EmployeePayrollData emp) {
+		addEmployeeToPayroll(emp.name, emp.salary,emp.startDate, "M");
+	}
+
+	public void updateEmployeeDataInJSONUsingThreads(List<EmployeePayrollData> EmpList) {
+		Map<Integer,Boolean> addStatus = new HashMap<>();
+		Runnable task = ()->{
+			for(EmployeePayrollData emp:EmpList) {
+				addStatus.put(emp.hashCode(),false);
+				addEmployeeToPayroll(emp);
+				addStatus.put(emp.hashCode(),true);
+			}
+		};
+		Thread thread=new Thread(task);
+		thread.start();
+		while(addStatus.containsValue(false)) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void updateEmployeeSalary(String name, double salary) {
+		EmployeePayrollData emp =  this.getEmployeePayrollData(name);
+		if(emp!=null) emp.salary=salary;
+	}
+
+	public void deleteEmployeePayroll(String name) {
+		employeeDataList.remove(getEmployeePayrollData(name));
 	}
 
 	//Main Method
