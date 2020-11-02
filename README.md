@@ -1,3 +1,3 @@
 # Employee-Payroll-Using-JDBC
 
-Modified to UC 4 - Retrieve all data from server
+Modified to UC 5 - Delete employee from server given employee name
