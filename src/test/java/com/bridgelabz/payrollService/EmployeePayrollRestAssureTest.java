@@ -90,4 +90,19 @@ public class EmployeePayrollRestAssureTest {
 		assertEquals(201, statusCode);
 		assertEquals(6, employeeFunction.countEntries(IOCommand.REST_IO));
 	}
+	
+	@Test
+	public void givenSalaryForEmployee_WhenUpdated_ShouldReturn200Response() {
+		employeeFunction.updateEmployeeSalary("Anil", 400000.0);
+		EmployeePayrollData emp =  employeeFunction.getEmployeePayrollData("Modi");
+		
+		String empJson = new Gson().toJson(emp);
+		RequestSpecification request = RestAssured.given();
+		request.header("Content-Type", "application/json");
+		request.body(empJson);		
+		Response respose = request.put("/employees/"+emp.id);
+		
+		int statusCode = respose.getStatusCode();
+		assertEquals(200, statusCode);
+	}
 }
